@@ -110,7 +110,8 @@
 
       "buildenv": "xenial-amd64",
       "builddeps": [
-        "build-essential"
+        "build-essential",
+        "curl"
       ],
       "buildcmd": [
         "packaging/tools/check-style.sh --install"
