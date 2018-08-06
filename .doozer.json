@@ -111,6 +111,7 @@
       "buildenv": "xenial-amd64",
       "builddeps": [
         "build-essential",
+        "git-core",
         "curl"
       ],
       "buildcmd": [
