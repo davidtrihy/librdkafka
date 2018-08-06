@@ -105,9 +105,8 @@
         "ctest -VV -R RdKafkaTestBrokerLess"
       ],
     }
-  },
 
-  "checkstyle": {
+    "checkstyle": {
 
       "buildenv": "xenial-amd64",
       "builddeps": [
@@ -119,5 +118,5 @@
     }
   },
 
-    "artifacts": ["config.log", "Makefile.config", "config.h"]
+  "artifacts": ["config.log", "Makefile.config", "config.h"]
 }
