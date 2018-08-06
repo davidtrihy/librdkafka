@@ -106,5 +106,18 @@
       ],
     }
   },
-  "artifacts": ["config.log", "Makefile.config", "config.h"]
+
+  "checkstyle": {
+
+      "buildenv": "xenial-amd64",
+      "builddeps": [
+        "build-essential"
+      ],
+      "buildcmd": [
+        "packaging/tools/check-style.sh --install"
+      ],
+    }
+  },
+
+    "artifacts": ["config.log", "Makefile.config", "config.h"]
 }
