@@ -119,11 +119,15 @@ class EventImpl : public Event {
 class HeadersImpl : public Headers {
  public:
   HeadersImpl (size_t initial_size):
-  free_headers_ (true) {
-    headers_ = rd_kafka_headers_new(initial_size);
-  }
+  headers_ (rd_kafka_headers_new(initial_size)), free_headers_ (true) {}
+
   HeadersImpl (rd_kafka_headers_t *headers):
   headers_ (headers), free_headers_ (false) {};
+
+  HeadersImpl (const std::vector<Header> &headers):
+  headers_ (rd_kafka_headers_new(headers.size())), free_headers_ (true) {
+    from_vector(headers);
+  }
 
   ~HeadersImpl() {
     if(free_headers_ && headers_) {
@@ -204,6 +208,16 @@ class HeadersImpl : public Headers {
   }
     
  private:
+  void from_vector(const std::vector<Header> &headers) {
+    if (headers.size() > 0) {
+      for (std::vector<Header>::const_iterator it = headers.begin();
+           it != headers.end();
+           it++) {
+        this->add(*it);
+      }
+    }
+  }
+
   HeadersImpl(HeadersImpl const&) /*= delete*/;
   HeadersImpl& operator=(HeadersImpl const&) /*= delete*/;
 
