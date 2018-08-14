@@ -1379,7 +1379,7 @@ class RD_EXPORT Headers {
  public:
   virtual ~Headers() = 0;
 
-  static Headers *create();
+  static Headers *create(size_t  = 8);
 
   /**
    * @brief Header object

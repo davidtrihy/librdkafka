@@ -118,7 +118,7 @@ class EventImpl : public Event {
 
 class HeadersImpl : public Headers {
  public:
-  HeadersImpl (size_t initial_size = 8):
+  HeadersImpl (size_t initial_size):
   free_headers_ (true) {
     headers_ = rd_kafka_headers_new(initial_size);
   }
@@ -202,8 +202,6 @@ class HeadersImpl : public Headers {
   struct rd_kafka_headers_s* c_headers() {
     return headers_;
   }
-
-  static Headers *create () {return 0;};
     
  private:
   HeadersImpl(HeadersImpl const&) /*= delete*/;
