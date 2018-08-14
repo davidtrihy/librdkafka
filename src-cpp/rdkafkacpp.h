@@ -75,6 +75,7 @@ extern "C" {
         struct rd_kafka_s;
         struct rd_kafka_topic_s;
         struct rd_kafka_message_s;
+        struct rd_kafka_headers_s;
 };
 
 namespace RdKafka {
@@ -1378,6 +1379,8 @@ class RD_EXPORT Headers {
  public:
   virtual ~Headers() = 0;
 
+  static Headers *create();
+
   /**
    * @brief Header object
    *
@@ -1437,6 +1440,10 @@ class RD_EXPORT Headers {
    * @returns a std::vector containing all of the Headers of a message
    */
   virtual std::vector<Header> get_all() const = 0;
+
+  virtual size_t size() const = 0;
+
+  virtual struct rd_kafka_headers_s *c_headers() = 0;
 };
 
 /**
@@ -1501,7 +1508,7 @@ class RD_EXPORT Message {
   virtual void               *msg_opaque () const = 0;
 
   /** @returns The Headers instance for this Message (if applicable) */
-  virtual Headers            *get_headers() = 0;
+  virtual RdKafka::Headers   *get_headers() = 0;
 
   virtual ~Message () = 0;
 
@@ -2222,8 +2229,8 @@ class RD_EXPORT Producer : public virtual Handle {
                              int msgflags,
                              void *payload, size_t len,
                              const void *key, size_t key_len,
-                             int64_t timestamp,
-                             void *msg_opaque) = 0;
+                             int64_t timestamp, void *msg_opaque,
+                             RdKafka::Headers *headers) = 0;
 
 
   /**

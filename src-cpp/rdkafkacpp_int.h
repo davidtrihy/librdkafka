@@ -118,8 +118,18 @@ class EventImpl : public Event {
 
 class HeadersImpl : public Headers {
  public:
+  HeadersImpl (size_t initial_size = 8):
+  free_headers_ (true) {
+    headers_ = rd_kafka_headers_new(initial_size);
+  }
   HeadersImpl (rd_kafka_headers_t *headers):
-  headers_ (headers) {};
+  headers_ (headers), free_headers_ (false) {};
+
+  ~HeadersImpl() {
+    if(free_headers_ && headers_) {
+      rd_kafka_headers_destroy(headers_);
+    }
+  }
 
   ErrorCode add(const Header& header) {
     rd_kafka_resp_err_t err;
@@ -184,9 +194,18 @@ class HeadersImpl : public Headers {
     }
     return headers;
   }
+
+  size_t size() const {
+    return rd_kafka_header_cnt(headers_);
+  }
+
+  struct rd_kafka_headers_s* c_headers() {
+    return headers_;
+  }
+
+  static Headers *create () {return 0;};
     
  private:
-  HeadersImpl ();
   HeadersImpl(HeadersImpl const&) /*= delete*/;
   HeadersImpl& operator=(HeadersImpl const&) /*= delete*/;
 
@@ -299,10 +318,10 @@ class MessageImpl : public Message {
    * used as a place holder and rkmessage_ is set to point to it. */
   rd_kafka_message_t rkmessage_err_;
   mutable std::string *key_; /* mutable because it's a cached value */
-  Headers *headers_;
+  RdKafka::Headers *headers_;
 
 private:
-  Headers* get_headers_from_rkmessage(rd_kafka_message_t *rkmessage) {
+  RdKafka::Headers* get_headers_from_rkmessage(rd_kafka_message_t *rkmessage) {
     rd_kafka_headers_t *hdrsp;
     rd_kafka_resp_err_t err;
 
@@ -992,8 +1011,8 @@ class ProducerImpl : virtual public Producer, virtual public HandleImpl {
                      int msgflags,
                      void *payload, size_t len,
                      const void *key, size_t key_len,
-                     int64_t timestamp,
-                     void *msg_opaque);
+                     int64_t timestamp, void *msg_opaque,
+                     RdKafka::Headers *headers);
 
   ErrorCode flush (int timeout_ms) {
 	  return static_cast<RdKafka::ErrorCode>(rd_kafka_flush(rk_,

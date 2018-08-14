@@ -33,6 +33,8 @@
 
 #include "rdkafkacpp_int.h"
 
+RdKafka::Headers  *RdKafka::Headers::create() {
+    return new RdKafka::HeadersImpl();
+}
 
 RdKafka::Headers::~Headers() {}
-
