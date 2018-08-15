@@ -213,6 +213,7 @@ class HeadersImpl : public Headers {
   ErrorCode destroy_headers() {
     if (headers_) {
       rd_kafka_headers_destroy(headers_);
+      headers_ = 0;
       return RdKafka::ERR_NO_ERROR;
     } else {
       return RdKafka::ERR_OPERATION_NOT_ATTEMPTED;
