@@ -33,12 +33,12 @@
 
 #include "rdkafkacpp_int.h"
 
-RdKafka::Headers  *RdKafka::Headers::create(size_t initial_count) {
-    return new RdKafka::HeadersImpl(initial_count);
+RdKafka::Headers  *RdKafka::Headers::create(size_t initial_count, bool free_rd_headers) {
+    return new RdKafka::HeadersImpl(initial_count, free_rd_headers);
 }
 
-RdKafka::Headers  *RdKafka::Headers::create(const std::vector<Header> &headers) {
-    return new RdKafka::HeadersImpl(headers);
+RdKafka::Headers  *RdKafka::Headers::create(const std::vector<Header> &headers, bool free_rd_headers) {
+    return new RdKafka::HeadersImpl(headers, free_rd_headers);
 }
 
 RdKafka::Headers::~Headers() {}

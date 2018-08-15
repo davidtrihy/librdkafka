@@ -842,39 +842,42 @@ int main (int argc, char **argv) {
        */
       std::ostringstream msg;
       msg << value_prefix << i;
-      RdKafka::Headers *headers = 0;
       while (true) {
         RdKafka::ErrorCode resp;
-       if (create_time == -1) {
-         resp = producer->produce(topic, partition,
+        RdKafka::Headers *headers;
+        if (create_time == -1) {
+          resp = producer->produce(topic, partition,
+                                    RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
+                                    const_cast<char *>(msg.str().c_str()),
+                                    msg.str().size(), NULL, NULL);
+        } else {
+          std::string name = "kafkaheader";
+          std::string val = "header_val";
+          std::vector<RdKafka::Headers::Header> headers_arr;
+          headers_arr.push_back(RdKafka::Headers::Header(name, val.c_str()));
+
+          headers = RdKafka::Headers::create(headers_arr, false);
+          resp = producer->produce(topics[0], partition,
                                   RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
                                   const_cast<char *>(msg.str().c_str()),
-                                  msg.str().size(), NULL, NULL);
-       } else {
-        std::string name = "kafkaheader";
-        std::string val = "header_val";
-
-        headers = RdKafka::Headers::create();
-        headers->add(name, val.c_str());
-        resp = producer->produce(topics[0], partition,
-                                 RdKafka::Producer::RK_MSG_COPY /* Copy payload */,
-                                 const_cast<char *>(msg.str().c_str()),
-                                 msg.str().size(),
-                                 NULL, 0,
-                                 create_time,
-                                 NULL, headers);
-       }
+                                  msg.str().size(),
+                                  NULL, 0,
+                                  create_time,
+                                  NULL, headers);
+        }
 
         if (resp == RdKafka::ERR__QUEUE_FULL) {
           producer->poll(100);
           continue;
         } else if (resp != RdKafka::ERR_NO_ERROR) {
+          headers->destroy_headers();
           errorString("producer_send_error",
                       RdKafka::err2str(resp), topic->name(), NULL, msg.str());
           state.producer.numErr++;
         } else {
           state.producer.numSent++;
         }
+        delete headers;
         break;
       }
 

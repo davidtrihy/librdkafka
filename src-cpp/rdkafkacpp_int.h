@@ -118,14 +118,19 @@ class EventImpl : public Event {
 
 class HeadersImpl : public Headers {
  public:
-  HeadersImpl (size_t initial_size):
-  headers_ (rd_kafka_headers_new(initial_size)), free_headers_ (true) {}
+  HeadersImpl (size_t initial_size, bool free_rd_headers):
+  headers_ (rd_kafka_headers_new(initial_size)), free_headers_ (free_rd_headers) {}
 
   HeadersImpl (rd_kafka_headers_t *headers):
   headers_ (headers), free_headers_ (false) {};
 
-  HeadersImpl (const std::vector<Header> &headers):
-  headers_ (from_vector(headers)), free_headers_ (true) {}
+  HeadersImpl (const std::vector<Header> &headers, bool free_rd_headers):
+  free_headers_ (free_rd_headers) {
+    if (headers.size() > 0) {
+      headers_ = rd_kafka_headers_new(headers.size());
+      from_vector(headers);
+    }
+  }
 
   ~HeadersImpl() {
     if(free_headers_ && headers_) {
@@ -204,18 +209,24 @@ class HeadersImpl : public Headers {
   struct rd_kafka_headers_s* c_headers() {
     return headers_;
   }
+
+  ErrorCode destroy_headers() {
+    if (headers_) {
+      rd_kafka_headers_destroy(headers_);
+      return RdKafka::ERR_NO_ERROR;
+    } else {
+      return RdKafka::ERR_OPERATION_NOT_ATTEMPTED;
+    }
+  }
     
  private:
-  rd_kafka_headers_t* from_vector(const std::vector<Header> &headers) {
+  void from_vector(const std::vector<Header> &headers) {
     if (headers.size() > 0) {
       for (std::vector<Header>::const_iterator it = headers.begin();
            it != headers.end();
            it++) {
-        this->add(*it);
+        this->add(it->key, it->value);
       }
-      return this->c_headers();
-    } else {
-      return 0;
     }
   }
 

@@ -1397,8 +1397,8 @@ class RD_EXPORT Headers {
     RdKafka::ErrorCode err;
   };
 
-  static Headers *create(size_t  = 8);
-  static Headers *create(const std::vector<Header> &headers);
+  static Headers *create(size_t  = 8, bool free_rd_headers = true);
+  static Headers *create(const std::vector<Header> &headers, bool free_rd_headers = true);
 
   /** 
    * @brief adds a Header to the end
@@ -1445,6 +1445,8 @@ class RD_EXPORT Headers {
   virtual size_t size() const = 0;
 
   virtual struct rd_kafka_headers_s *c_headers() = 0;
+
+  virtual ErrorCode destroy_headers() = 0;
 };
 
 /**
