@@ -37,4 +37,8 @@ RdKafka::Headers  *RdKafka::Headers::create(size_t initial_count) {
     return new RdKafka::HeadersImpl(initial_count);
 }
 
+RdKafka::Headers  *RdKafka::Headers::create(const std::vector<Header> &headers) {
+    return new RdKafka::HeadersImpl(headers);
+}
+
 RdKafka::Headers::~Headers() {}

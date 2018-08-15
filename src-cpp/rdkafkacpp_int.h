@@ -125,9 +125,7 @@ class HeadersImpl : public Headers {
   headers_ (headers), free_headers_ (false) {};
 
   HeadersImpl (const std::vector<Header> &headers):
-  headers_ (rd_kafka_headers_new(headers.size())), free_headers_ (true) {
-    from_vector(headers);
-  }
+  headers_ (from_vector(headers)), free_headers_ (true) {}
 
   ~HeadersImpl() {
     if(free_headers_ && headers_) {
@@ -208,13 +206,16 @@ class HeadersImpl : public Headers {
   }
     
  private:
-  void from_vector(const std::vector<Header> &headers) {
+  rd_kafka_headers_t* from_vector(const std::vector<Header> &headers) {
     if (headers.size() > 0) {
       for (std::vector<Header>::const_iterator it = headers.begin();
            it != headers.end();
            it++) {
         this->add(*it);
       }
+      return this->c_headers();
+    } else {
+      return 0;
     }
   }
 

@@ -842,6 +842,7 @@ int main (int argc, char **argv) {
        */
       std::ostringstream msg;
       msg << value_prefix << i;
+      RdKafka::Headers *headers = 0;
       while (true) {
         RdKafka::ErrorCode resp;
        if (create_time == -1) {
@@ -853,7 +854,7 @@ int main (int argc, char **argv) {
         std::string name = "kafkaheader";
         std::string val = "header_val";
 
-        RdKafka::Headers *headers = RdKafka::Headers::create();
+        headers = RdKafka::Headers::create();
         headers->add(name, val.c_str());
         resp = producer->produce(topics[0], partition,
                                  RdKafka::Producer::RK_MSG_COPY /* Copy payload */,

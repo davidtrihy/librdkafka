@@ -1379,8 +1379,6 @@ class RD_EXPORT Headers {
  public:
   virtual ~Headers() = 0;
 
-  static Headers *create(size_t  = 8);
-
   /**
    * @brief Header object
    *
@@ -1398,6 +1396,9 @@ class RD_EXPORT Headers {
     const char* value;
     RdKafka::ErrorCode err;
   };
+
+  static Headers *create(size_t  = 8);
+  static Headers *create(const std::vector<Header> &headers);
 
   /** 
    * @brief adds a Header to the end
