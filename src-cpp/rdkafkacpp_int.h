@@ -129,6 +129,8 @@ class HeadersImpl : public Headers {
     if (headers.size() > 0) {
       headers_ = rd_kafka_headers_new(headers.size());
       from_vector(headers);
+    } else {
+      headers_ = rd_kafka_headers_new(8);
     }
   }
 
@@ -137,14 +139,6 @@ class HeadersImpl : public Headers {
       rd_kafka_headers_destroy(headers_);
     }
   }
-
-  ErrorCode add(const Header& header) {
-    rd_kafka_resp_err_t err;
-    err = rd_kafka_header_add(headers_,
-                              header.key.c_str(), header.key.size(),
-                              header.value, strlen(header.value));
-    return static_cast<RdKafka::ErrorCode>(err);
-  } 
 
   ErrorCode add(const std::string& key, const char* value) {
     rd_kafka_resp_err_t err;

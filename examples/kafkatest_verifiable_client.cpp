@@ -460,6 +460,7 @@ void msg_consume(RdKafka::KafkaConsumer *consumer,
         RdKafka::Headers *headers = msg->get_headers();
         if (headers) {
           std::vector<RdKafka::Headers::Header> sheaders = headers->get_all();
+          std::cout << "Headers length: " << sheaders.size() << std::endl;
           for(std::vector<RdKafka::Headers::Header>::const_iterator it = sheaders.begin();
               it != sheaders.end();
               it++) {
@@ -877,6 +878,7 @@ int main (int argc, char **argv) {
         } else {
           state.producer.numSent++;
         }
+
         delete headers;
         break;
       }
